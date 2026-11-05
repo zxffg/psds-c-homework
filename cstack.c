@@ -18,13 +18,14 @@ typedef struct node s_node;
 
 // структура slot: храним статус ячейки MAX_STACKS, ссылку на верхний узел и
 // кол-во элементов в стеке
-typedef struct
+struct slot
 {
     int usage;          // если используется: 1, елси нет то 0
     s_node* top;        // указатель на верхний узел
     unsigned int count; // кол-во элементов в стеке
-} slot;
-static slot slots[MAX_STACKS];
+};
+typedef struct slot s_slot;
+static s_slot slots[MAX_STACKS];
 
 // проверяем заняты ячейки или нет
 hstack_t stack_new(void)
@@ -93,7 +94,8 @@ unsigned int stack_size(const hstack_t hstack)
     return slots[hstack].count;
 }
 
-// получаем статус: создан стек или нет
+// получаем узел, данные и размер -> создаем ячейку -> кладем в стек и двигаем
+// указатель
 static int push_internal(
     const hstack_t hstack, const void* data_in, const unsigned int size
 )
@@ -169,7 +171,8 @@ hstack_t stack_get_all(void)
         return -1;
     }
 
-    for (int i = 0; i < MAX_STACKS; ++i)
+    for (hstack_t i = 0; i < MAX_STACKS;
+         ++i) // теперь i имеет тип, по размерам совпадающий с стеком
     {
         if (i != result && slots[i].usage == 1)
         { // если такой стек уже есть и это не мы
